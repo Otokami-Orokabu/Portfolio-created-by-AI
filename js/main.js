@@ -381,6 +381,12 @@ function openShaderDetail(shaderId) {
         // Re-initialize gallery
         initGallery();
         
+        // Clear any existing hero shader canvas
+        const heroContainer = document.getElementById('hero-shader');
+        if (heroContainer) {
+            heroContainer.innerHTML = '';
+        }
+        
         // Re-initialize hero shader
         initHeroShader();
         
