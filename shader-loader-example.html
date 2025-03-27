@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Shader Loader Example</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #00b3ff;
+            margin-bottom: 20px;
+        }
+        
+        .shader-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        pre {
+            background-color: #121212;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            margin-top: 20px;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            color: #a0a0a0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #00b3ff;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>外部シェーダーファイルの読み込み例</h1>
+        
+        <div class="shader-container" id="shader-container">
+            <!-- Canvas will be inserted here -->
+        </div>
+        
+        <h2>説明</h2>
+        <p>
+            このページは、外部の.fragファイルからフラグメントシェーダーを読み込む方法を示しています。
+            上記のシェーダーは <code>shaders/wave.frag</code> から読み込まれています。
+        </p>
+        
+        <h2>コード例</h2>
+        <pre><code>// シェーダーファイルを読み込む関数
+async function loadShaderSource(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to load shader from ${url}: ${response.statusText}`);
+        }
+        return await response.text();
+    } catch (error) {
+        console.error('Error loading shader:', error);
+        throw error;
+    }
+}
+
+// 使用例
+async function initShader() {
+    try {
+        // 外部ファイルからシェーダーソースを読み込む
+        const fragmentShaderSource = await loadShaderSource('shaders/wave.frag');
+        
+        // シェーダープログラムを作成
+        const program = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
+        
+        // 以降は通常のWebGLコードと同様
+        // ...
+    } catch (error) {
+        console.error('Failed to initialize shader:', error);
+    }
+}</code></pre>
+        
+        <a href="index.html" class="back-link">← メインページに戻る</a>
+    </div>
+    
+    <script>
+        // Simple vertex shader
+        const vertexShaderSource = `
+            attribute vec2 a_position;
+            attribute vec2 a_texCoord;
+            
+            varying vec2 v_texCoord;
+            
+            void main() {
+                gl_Position = vec4(a_position, 0.0, 1.0);
+                v_texCoord = a_texCoord;
+            }
+        `;
+        
+        // Load external fragment shader
+        async function loadShaderSource(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Failed to load shader from ${url}: ${response.statusText}`);
+                }
+                return await response.text();
+            } catch (error) {
+                console.error('Error loading shader:', error);
+                throw error;
+            }
+        }
+        
+        // Create shader
+        function createShader(gl, source, type) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            
+            return shader;
+        }
+        
+        // Create program
+        function createProgram(gl, vertexShader, fragmentShader) {
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('Program linking error:', gl.getProgramInfoLog(program));
+                gl.deleteProgram(program);
+                return null;
+            }
+            
+            return program;
+        }
+        
+        // Create full-screen quad
+        function createFullScreenQuad(gl) {
+            // Create a buffer for positions
+            const positions = new Float32Array([
+                -1, -1,
+                 1, -1,
+                -1,  1,
+                 1,  1
+            ]);
+            
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+            
+            // Create a buffer for texture coordinates
+            const texCoords = new Float32Array([
+                0, 0,
+                1, 0,
+                0, 1,
+                1, 1
+            ]);
+            
+            const texCoordBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+            
+            return {
+                position: {
+                    buffer: positionBuffer,
+                    size: 2
+                },
+                texCoord: {
+                    buffer: texCoordBuffer,
+                    size: 2
+                },
+                vertexCount: 4
+            };
+        }
+        
+        // Initialize WebGL
+        async function initWebGL() {
+            const container = document.getElementById('shader-container');
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            container.appendChild(canvas);
+            
+            // Get WebGL context
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) {
+                container.innerHTML = '<div style="color: red; padding: 20px;">WebGL is not supported in your browser</div>';
+                return;
+            }
+            
+            try {
+                // Load fragment shader from external file
+                const fragmentShaderSource = await loadShaderSource('shaders/wave.frag');
+                
+                // Create shaders
+                const vertexShader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+                const fragmentShader = createShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+                
+                if (!vertexShader || !fragmentShader) {
+                    throw new Error('Failed to create shaders');
+                }
+                
+                // Create program
+                const program = createProgram(gl, vertexShader, fragmentShader);
+                if (!program) {
+                    throw new Error('Failed to create program');
+                }
+                
+                // Create quad
+                const quad = createFullScreenQuad(gl);
+                
+                // Get attribute locations
+                const positionLocation = gl.getAttribLocation(program, 'a_position');
+                const texCoordLocation = gl.getAttribLocation(program, 'a_texCoord');
+                
+                // Get uniform locations
+                const timeLocation = gl.getUniformLocation(program, 'u_time');
+                const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+                const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+                
+                // Set up mouse tracking
+                let mousePosition = { x: 0.5, y: 0.5 };
+                
+                canvas.addEventListener('mousemove', (event) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mousePosition.x = (event.clientX - rect.left) / rect.width;
+                    mousePosition.y = (event.clientY - rect.top) / rect.height;
+                });
+                
+                canvas.addEventListener('mouseleave', () => {
+                    mousePosition.x = 0.5;
+                    mousePosition.y = 0.5;
+                });
+                
+                // Animation variables
+                const startTime = performance.now();
+                
+                // Render function
+                function render() {
+                    // Calculate elapsed time
+                    const now = performance.now();
+                    const elapsed = (now - startTime) * 0.001; // Convert to seconds
+                    
+                    // Resize canvas if needed
+                    if (canvas.width !== container.clientWidth || canvas.height !== container.clientHeight) {
+                        canvas.width = container.clientWidth;
+                        canvas.height = container.clientHeight;
+                        gl.viewport(0, 0, canvas.width, canvas.height);
+                    }
+                    
+                    // Clear canvas
+                    gl.clearColor(0, 0, 0, 1);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    
+                    // Use program
+                    gl.useProgram(program);
+                    
+                    // Set up position attribute
+                    gl.bindBuffer(gl.ARRAY_BUFFER, quad.position.buffer);
+                    gl.enableVertexAttribArray(positionLocation);
+                    gl.vertexAttribPointer(positionLocation, quad.position.size, gl.FLOAT, false, 0, 0);
+                    
+                    // Set up texCoord attribute
+                    gl.bindBuffer(gl.ARRAY_BUFFER, quad.texCoord.buffer);
+                    gl.enableVertexAttribArray(texCoordLocation);
+                    gl.vertexAttribPointer(texCoordLocation, quad.texCoord.size, gl.FLOAT, false, 0, 0);
+                    
+                    // Set uniforms
+                    gl.uniform1f(timeLocation, elapsed);
+                    gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+                    gl.uniform2f(mouseLocation, mousePosition.x, mousePosition.y);
+                    
+                    // Draw
+                    gl.drawArrays(gl.TRIANGLE_STRIP, 0, quad.vertexCount);
+                    
+                    // Request next frame
+                    requestAnimationFrame(render);
+                }
+                
+                // Start animation
+                render();
+                
+            } catch (error) {
+                console.error('Error initializing WebGL:', error);
+                container.innerHTML = `<div style="color: red; padding: 20px;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Initialize when the page loads
+        window.addEventListener('load', initWebGL);
+    </script>
+</body>
+</html>

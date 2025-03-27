@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fragment Shaderエフェクトとデモシーン作品のポートフォリオ">
+    <title>Fragment Shader Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <!-- Open Graph Protocol -->
+    <meta property="og:title" content="Fragment Shader Portfolio">
+    <meta property="og:description" content="Fragment Shaderエフェクトとデモシーン作品のポートフォリオ">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/orsss/">
+    <meta property="og:image" content="https://yourusername.github.io/orsss/images/og-image.png">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Fragment Shader Portfolio</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section with Featured Shader -->
+        <section id="home" class="hero">
+            <div class="shader-container" id="hero-shader">
+                <!-- WebGL Canvas will be inserted here by JS -->
+            </div>
+            <div class="hero-content">
+                <h2>Creative Shader Effects</h2>
+                <p>WebGLとGLSLを使用したインタラクティブなビジュアルエフェクト</p>
+                <a href="#gallery" class="btn">作品を見る</a>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="gallery">
+            <div class="container">
+                <h2>Shader Gallery</h2>
+                <div class="gallery-grid">
+                    <!-- Gallery items will be dynamically generated from shaders.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="container">
+                <h2>About</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>このポートフォリオサイトでは、WebGLとGLSLを使用して作成したFragment Shaderエフェクトやデモシーン風の作品を公開しています。</p>
+                        <p>グラフィックスプログラミングやクリエイティブコーディングに情熱を持ち、視覚的に魅力的なインタラクティブ体験の創造を目指しています。</p>
+                        <h3>使用技術</h3>
+                        <ul>
+                            <li>WebGL / GLSL</li>
+                            <li>JavaScript</li>
+                            <li>HTML5 / CSS3</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>Contact</h2>
+                <p>お問い合わせやコラボレーションのご提案は以下からお願いします。</p>
+                <div class="contact-links">
+                    <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="mailto:your.email@example.com">Email</a>
+                    <a href="https://twitter.com/yourusername" target="_blank" rel="noopener noreferrer">Twitter</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Fragment Shader Portfolio. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/webgl-utils.js"></script>
+    <script src="js/shader-manager.js"></script>
+    <script src="js/shaders.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
