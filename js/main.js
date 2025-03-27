@@ -637,3 +637,5 @@ function showShaderError(container, message) {
 function escapeHtml(html) {
     const div = document.createElement('div');
     div.textContent = html;
+    return div.innerHTML;
+}
