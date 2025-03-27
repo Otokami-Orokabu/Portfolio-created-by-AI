@@ -1,0 +1,34 @@
+# EditorConfig is a file format for defining coding styles
+# https://editorconfig.org/
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# HTML, CSS, JavaScript, JSON
+[*.{html,css,js,json}]
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# GLSL Shader files
+[*.{frag,vert,glsl}]
+indent_size = 4
+
+# Python files
+[*.py]
+indent_size = 4
+
+# Makefile requires tabs
+[Makefile]
+indent_style = tab
